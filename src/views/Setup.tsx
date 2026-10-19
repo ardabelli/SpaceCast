@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { CLAUDE_MODELS, PROVIDERS, PROVIDER_ORDER, pickModel, type ProviderId, type PublicSettings } from '../../shared/providers.ts';
-import { TWIN_ID } from '../../shared/seed.ts';
 import type { ClaudeInfo } from '../../shared/types.ts';
 import { Icon } from '../icons.tsx';
 import { api, setKey, showToast, useStore } from '../store.ts';
-import { Avatar, Modal } from '../ui.tsx';
+import { Modal } from '../ui.tsx';
+import { AvatarPicker } from './AvatarPicker.tsx';
 
 interface SetupStatus {
   settings: PublicSettings;
@@ -291,7 +291,6 @@ export function Setup() {
   const [tested, setTested] = useState(false);
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState('');
-  const twin = state?.agents.find((a) => a.id === TWIN_ID);
   const last = local ? 3 : 2;
 
   const finish = async () => {
@@ -333,7 +332,6 @@ export function Setup() {
               <input className="input" value={userName} maxLength={40} placeholder="Adın" autoFocus onChange={(e) => setUserName(e.target.value)} />
             </label>
             <div className="row" style={{ gap: 16, alignItems: 'flex-start' }}>
-              {twin && <Avatar agent={{ ...twin, name: twinName || twin.name }} size="lg" />}
               <label className="field grow">
                 <span>DİJİTAL İKİZİNİN ADI</span>
                 <input className="input" value={twinName} maxLength={24} placeholder="ör. Nova" onChange={(e) => setTwinName(e.target.value)} />
@@ -342,6 +340,10 @@ export function Setup() {
                 </div>
                 <small className="dim">İkizin seni temsil eder, ekipleri yönetir ve sana rapor verir. Adını sonra Ayarlar'dan değiştirebilirsin.</small>
               </label>
+            </div>
+            <div className="field">
+              <span>{(twinName.trim() || 'İKİZİNİN').toLocaleUpperCase('en')} NASIL GÖRÜNSÜN?</span>
+              <AvatarPicker />
             </div>
             <div className="row">
               <button className="btn ghost" onClick={() => setStep(0)}>Geri</button>
@@ -426,6 +428,10 @@ export function SettingsModal() {
           <label className="field grow"><span>SENİN ADIN</span><input className="input" value={userName} maxLength={40} onChange={(e) => setUserName(e.target.value)} /></label>
           <label className="field grow"><span>İKİZİNİN ADI</span><input className="input" value={twinName} maxLength={24} onChange={(e) => setTwinName(e.target.value)} /></label>
         </div>
+      </section>
+      <section className="col" style={{ gap: 10 }}>
+        <h3 className="sec-h">İkizin karakteri <small className="dim">· seçince hemen değişir</small></h3>
+        <AvatarPicker />
       </section>
       <section className="col" style={{ gap: 10 }}>
         <h3 className="sec-h">Yapay zekâ sağlayıcısı</h3>

@@ -3,7 +3,7 @@
 import type { CSSProperties } from 'react';
 import { themeOf } from '../shared/meta.ts';
 import type { Agent, AppState } from '../shared/types.ts';
-import { npc, type Sheet } from './pixelart.ts';
+import { npc, twinSprite, type Sheet } from './pixelart.ts';
 
 /** Ajanın oda teması ve ekip lideri olup olmadığı (kıyafetini belirler). */
 export function agentLook(s: AppState, a: Agent) {
@@ -13,6 +13,7 @@ export function agentLook(s: AppState, a: Agent) {
 }
 
 export function sheetFor(s: AppState, a: Agent): Sheet {
+  if (a.kind === 'twin') return twinSprite(a.avatar);
   const { theme, lead } = agentLook(s, a);
   return npc(a.id, a.kind, theme, lead, a.color);
 }

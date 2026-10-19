@@ -10,7 +10,7 @@ import { twinOf } from '../../shared/twin.ts';
 import type { Agent, AppState, Team } from '../../shared/types.ts';
 import { Icon, TeamIcon } from '../icons.tsx';
 import { Npc, Prop, agentLook, sheetFor } from '../npc.tsx';
-import { decorStrip, floorTile, knight, station } from '../pixelart.ts';
+import { decorStrip, floorTile, station, twinSprite } from '../pixelart.ts';
 import { useAppState, useStore } from '../store.ts';
 import { asteroid, darken, plating } from '../textures.ts';
 import { STATUS_LABEL, money } from '../ui.tsx';
@@ -294,7 +294,7 @@ function Reactor({ s, twin, box, running, onClick, onTalk }: { s: AppState; twin
           <path className="arc a3" d="M18 80 L32 72 L34 82 L46 76" />
         </svg>
         <div className={`knight ${st !== 'idle' ? 'active' : ''}`}>
-          <Npc sheet={knight()} scale={3} />
+          <Npc sheet={twinSprite(twin.avatar)} scale={3} />
         </div>
       </div>
       <div className="core-name">{twin.name}</div>

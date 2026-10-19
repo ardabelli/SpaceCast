@@ -7,7 +7,7 @@ import type { Attachment, ChatMsg } from '../../shared/types.ts';
 import { Icon } from '../icons.tsx';
 import { openFloating } from '../widget.tsx';
 import { Npc } from '../npc.tsx';
-import { knight } from '../pixelart.ts';
+import { twinSprite } from '../pixelart.ts';
 import { fileUrl, getKey, showToast, useActiveChat, useAppState, useStore, useTwinName } from '../store.ts';
 import { ChatTabs } from './ChatTabs.tsx';
 import { EffortPicker } from './EffortPicker.tsx';
@@ -151,7 +151,7 @@ export function Chat({ docked, widget }: { docked?: boolean; widget?: boolean })
       <div className="chat-h">
         {twin && (
           <span className="chat-av">
-            <Npc sheet={knight()} scale={2} className="portrait" />
+            <Npc sheet={twinSprite(twin.avatar)} scale={2} className="portrait" />
           </span>
         )}
         <div className="grow">

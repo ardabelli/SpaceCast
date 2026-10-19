@@ -32,6 +32,26 @@ export const KINDS: Record<AgentKind, { label: string; emoji: string }> = {
   custom: { label: 'Özel', emoji: '🤖' },
 };
 
+/** Dijital ikiz için seçilebilen karakterler (çizimleri src/pixelart.ts → twinSprite). */
+export const TWIN_AVATARS: { id: string; label: string }[] = [
+  { id: 'woman', label: 'Gezgin' },
+  { id: 'man', label: 'Kaşif' },
+  { id: 'scientist', label: 'Bilim insanı' },
+  { id: 'hacker', label: 'Hacker' },
+  { id: 'pilot', label: 'Pilot' },
+  { id: 'captain', label: 'Yıldız kaptanı' },
+  { id: 'astronaut', label: 'Astronot' },
+  { id: 'elf', label: 'Elf okçu' },
+  { id: 'wizard', label: 'Uzay büyücüsü' },
+  { id: 'vampire', label: 'Vampir' },
+  { id: 'pirate', label: 'Uzay korsanı' },
+  { id: 'ninja', label: 'Siber ninja' },
+  { id: 'android', label: 'Android' },
+  { id: 'alien', label: 'Uzaylı' },
+  { id: 'cat', label: 'Uzay kedisi' },
+  { id: 'knight', label: 'Nükleer şövalye' },
+];
+
 /** Düşünme seviyesi: yüksek seviye daha iyi düşünür ama yavaştır ve daha çok token harcar. */
 export const EFFORTS: Record<'low' | 'medium' | 'high', { label: string; hint: string }> = {
   low: { label: 'Düşük', hint: 'Hızlı ve az token: sohbet, planlama, özet, basit işler' },

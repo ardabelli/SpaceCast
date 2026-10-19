@@ -40,6 +40,8 @@ export interface Agent {
   paused: boolean;
   /** Düşünme seviyesi; 'auto' ya da boş = rolüne göre önerilen */
   effort?: Effort;
+  /** Dijital ikizin karakteri (TWIN_AVATARS); boş = nükleer şövalye */
+  avatar?: string;
   x: number;
   y: number;
 }

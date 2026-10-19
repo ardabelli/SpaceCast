@@ -6,6 +6,7 @@ import type { Agent, AgentKind, Autonomy, ModelId } from '../../shared/types.ts'
 import { createAgent } from '../actions.ts';
 import { useAppState, useStore } from '../store.ts';
 import { Avatar, Bar, StatusBadge, kfmt, modelLabel, money } from '../ui.tsx';
+import { AvatarPicker } from './AvatarPicker.tsx';
 import { EffortPicker } from './EffortPicker.tsx';
 import { Feed } from './Logs.tsx';
 
@@ -123,6 +124,13 @@ export function AgentDrawer({ id }: { id: string }) {
               </select>
             </label>
           </div>
+
+          {a.kind === 'twin' && (
+            <div className="field">
+              <span>Karakter</span>
+              <AvatarPicker />
+            </div>
+          )}
 
           <EffortPicker agent={a} />
 

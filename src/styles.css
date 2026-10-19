@@ -980,3 +980,14 @@ body.pip .chat, .widget-shell .chat {
 }
 .effort-sel:hover, .effort-sel:focus { color: var(--text); border-color: var(--accent); outline: none; }
 @media (max-width: 720px) { .effort-sel { max-width: 130px; } }
+
+/* ---------------------------------------------------------------- ikiz karakter seçimi */
+
+.avatar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 6px; }
+.avatar-opt {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 4px 6px;
+  border: 1px solid var(--line-2); border-radius: 10px; background: var(--panel); color: var(--muted);
+}
+.avatar-opt span:last-child { font-size: 11px; line-height: 1.2; text-align: center; }
+.avatar-opt:hover { border-color: var(--muted); color: var(--text); }
+.avatar-opt.on { border-color: var(--accent); background: var(--accent-soft); color: var(--text); }

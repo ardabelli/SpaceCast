@@ -340,6 +340,8 @@ setInterval(() => {
 
 let last = 0;
 setInterval(() => {
+  // Simülasyon kapalıyken boşuna uyanma
+  if (!state.sim.running) return;
   const now = Date.now();
   if (now - last < 1000 / state.sim.speed) return;
   last = now;
@@ -349,7 +351,7 @@ setInterval(() => {
     dirty = true;
     broadcast();
   }
-}, 100);
+}, 500);
 
 // ---------------------------------------------------------------- başlat
 

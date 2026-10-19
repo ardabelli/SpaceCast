@@ -117,6 +117,10 @@ SpaceCast bilgisayarında küçük bir sunucu olarak çalışır; kapalıyken aj
 
 ![Ayarlar](docs/screenshots/ayarlar.png)
 
+## Pil ve ısı
+
+SpaceCast varsayılan olarak **pil dostu** çalışır: boştayken ekranda hiçbir şey hareket etmez, ekran kartı dinlenir. Yalnızca bir ekip çalışırken kablolarda saniyede birkaç karelik yavaş bir akış, ikiz düşünürken de reaktörde hafif bir nabız olur. Bulanıklık gibi pahalı efektler kullanılmaz. Kayan yıldızlar, yürüyen karakterler ve dönen reaktör halkaları istersen **Ayarlar → Arka plan → Canlı animasyonlar** ile açılır (daha çok pil yer).
+
 ## Güvenlik ve gizlilik
 
 - Sohbetler, görevler, ayarlar ve API anahtarları yalnızca `data/` klasöründe durur ve git'e eklenmez.

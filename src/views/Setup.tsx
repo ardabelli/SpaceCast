@@ -234,6 +234,15 @@ function Toggle({ on, label, hint, disabled, onChange }: { on: boolean; label: s
   );
 }
 
+function LivelyToggle() {
+  const lively = useStore((s) => s.lively);
+  const setLively = useStore((s) => s.setLively);
+  return (
+    <Toggle on={lively} label="Canlı animasyonlar" onChange={setLively}
+      hint={lively ? 'Yıldızlar kayar, karakterler yürür, reaktör döner. Ekran kartını sürekli çalıştırır: pil yer, bilgisayarı ısıtabilir.' : 'Kapalı (pil dostu): boştayken ekran hareketsiz kalır, yalnızca ekip çalışırken kablolarda yavaş akış olur.'} />
+  );
+}
+
 export function ServerOptions({ showStop = true }: { showStop?: boolean }) {
   const sys = useStore((s) => s.system);
   const local = useStore((s) => s.local);
@@ -438,6 +447,7 @@ export function SettingsModal() {
       <section className="col" style={{ gap: 10 }}>
         <h3 className="sec-h">Arka plan <small className="dim">· bu cihazda, seçince hemen değişir</small></h3>
         <SpacePicker />
+        <LivelyToggle />
       </section>
       <section className="col" style={{ gap: 10 }}>
         <h3 className="sec-h">Vurgu rengi <small className="dim">· düğmeler, sekmeler ve reaktör ışıkları</small></h3>

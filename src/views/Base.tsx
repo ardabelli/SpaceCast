@@ -226,6 +226,8 @@ export function Base() {
                   <path d={d} className="pipe-inner" />
                   <path d={d} className="pipe-cable" transform="translate(-5 -5)" />
                   <path d={d} className="pipe-cable" transform="translate(5 5)" />
+                  <path d={d} className={`pipe-glow out ${mode}`} transform="translate(-5 -5)" />
+                  <path d={d} className={`pipe-glow in ${mode}`} transform="translate(5 5)" />
                   <path d={d} className={`pipe-lane out ${mode}`} transform="translate(-5 -5)" />
                   <path d={d} className={`pipe-lane in ${mode}`} transform="translate(5 5)" />
                 </g>

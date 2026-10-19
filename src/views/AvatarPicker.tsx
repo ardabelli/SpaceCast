@@ -7,15 +7,15 @@ import { twinSprite } from '../pixelart.ts';
 import { useStore } from '../store.ts';
 
 export function AvatarPicker() {
-  const twin = useStore((x) => x.state?.agents.find((a) => a.id === TWIN_ID));
+  // Yalnızca karakter kimliği izlenir: üs durumu her değiştiğinde 16 karakter yeniden çizilmesin
+  const avatar = useStore((x) => x.state?.agents.find((a) => a.id === TWIN_ID)?.avatar ?? 'knight');
   const dispatch = useStore((x) => x.dispatch);
-  if (!twin) return null;
-  const value = twin.avatar ?? 'knight';
+  const value = avatar;
   return (
     <div className="avatar-grid" role="radiogroup" aria-label="İkizin karakteri">
       {TWIN_AVATARS.map((c) => (
         <button key={c.id} role="radio" aria-checked={value === c.id} className={`avatar-opt ${value === c.id ? 'on' : ''}`} title={c.label}
-          onClick={() => dispatch({ type: 'agent/update', id: twin.id, patch: { avatar: c.id } })}>
+          onClick={() => dispatch({ type: 'agent/update', id: TWIN_ID, patch: { avatar: c.id } })}>
           <Npc sheet={twinSprite(c.id)} scale={3} moving={value === c.id} />
           <span>{c.label}</span>
         </button>

@@ -29,6 +29,8 @@ interface Store {
   spaceTheme: string;
   /** Vurgu rengi (bu cihazda) */
   accent: string;
+  /** Canlı animasyonlar (bu cihazda; kapalıyken pil dostu, boştayken hareketsiz) */
+  lively: boolean;
   view: View;
   selectedAgentId: string | null;
   selectedMissionId: string | null;
@@ -42,12 +44,14 @@ interface Store {
   markSeen: (marks: Record<string, number>) => void;
   setSpaceTheme: (id: string) => void;
   setAccent: (id: string) => void;
+  setLively: (on: boolean) => void;
 }
 
 const CHAT_KEY = 'sc-chat';
 const SEEN_KEY = 'sc-seen';
 const SPACE_KEY = 'sc-space';
 const ACCENT_KEY = 'sc-accent';
+const LIVELY_KEY = 'sc-lively';
 const load = <T,>(k: string, d: T): T => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } };
 const keep = (k: string, v: unknown) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* özel pencere */ } };
 
@@ -117,6 +121,7 @@ export const useStore = create<Store>((set, get) => ({
   seen: load<Record<string, number>>(SEEN_KEY, {}),
   spaceTheme: load<string>(SPACE_KEY, 'nebula'),
   accent: load<string>(ACCENT_KEY, 'green'),
+  lively: load<boolean>(LIVELY_KEY, false),
   view: VIEWS.includes(location.hash.slice(1) as View) ? (location.hash.slice(1) as View) : 'base',
   selectedAgentId: null,
   selectedMissionId: null,
@@ -136,6 +141,7 @@ export const useStore = create<Store>((set, get) => ({
   setActiveChat: (id) => { keep(CHAT_KEY, id); set({ activeChatId: id }); },
   setSpaceTheme: (id) => { keep(SPACE_KEY, id); set({ spaceTheme: id }); },
   setAccent: (id) => { keep(ACCENT_KEY, id); set({ accent: id }); },
+  setLively: (on) => { keep(LIVELY_KEY, on); set({ lively: on }); },
   markSeen: (marks) => {
     const seen = { ...get().seen, ...marks };
     keep(SEEN_KEY, seen);

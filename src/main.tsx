@@ -8,7 +8,11 @@ import { connect, useStore } from './store.ts';
 
 // Vurgu rengi ilk karede uygulansın (yeşilden geçiş görünmesin), değişince güncellensin
 applyAccent(useStore.getState().accent);
-useStore.subscribe((s, prev) => { if (s.accent !== prev.accent) applyAccent(s.accent); });
+document.body.classList.toggle('lively', useStore.getState().lively);
+useStore.subscribe((s, prev) => {
+  if (s.accent !== prev.accent) applyAccent(s.accent);
+  if (s.lively !== prev.lively) document.body.classList.toggle('lively', s.lively);
+});
 
 connect();
 

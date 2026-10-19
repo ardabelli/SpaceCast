@@ -78,6 +78,10 @@ export function App() {
   const needsKey = useStore((s) => s.needsKey);
   const twinName = useTwinName();
   const time = useClock();
+  // Pencere ya da ajan paneli açıkken arkadaki animasyonları duraklat (styles.css: body.overlay-open)
+  useEffect(() => {
+    document.body.classList.toggle('overlay-open', !!modal || !!selectedAgentId);
+  }, [modal, selectedAgentId]);
   const dock = useDockWidth();
 
   // Uçan pencere desteklenmeyen tarayıcılarda açılan küçük pencere

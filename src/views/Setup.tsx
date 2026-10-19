@@ -239,7 +239,7 @@ function LivelyToggle() {
   const setLively = useStore((s) => s.setLively);
   return (
     <Toggle on={lively} label="Canlı animasyonlar" onChange={setLively}
-      hint={lively ? 'Yıldızlar kayar, karakterler yürür, reaktör döner. Ekran kartını sürekli çalıştırır: pil yer, bilgisayarı ısıtabilir.' : 'Kapalı (pil dostu): boştayken ekran hareketsiz kalır, yalnızca ekip çalışırken kablolarda yavaş akış olur.'} />
+      hint={lively ? 'Yıldızlar kayar, karakterler yürür, reaktör döner. Ekran kartını sürekli çalıştırır: pil yer, bilgisayarı ısıtabilir.' : 'Kapalı (pil dostu): karakterler ve reaktör saniyede birkaç karelik piksel oyunu hızında hareket eder, ekran kartı arada dinlenir.'} />
   );
 }
 

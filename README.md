@@ -119,7 +119,7 @@ SpaceCast bilgisayarında küçük bir sunucu olarak çalışır; kapalıyken aj
 
 ## Pil ve ısı
 
-SpaceCast varsayılan olarak **pil dostu** çalışır: boştayken ekranda hiçbir şey hareket etmez, ekran kartı dinlenir. Yalnızca bir ekip çalışırken kablolarda saniyede birkaç karelik yavaş bir akış, ikiz düşünürken de reaktörde hafif bir nabız olur. Bulanıklık gibi pahalı efektler kullanılmaz. Kayan yıldızlar, yürüyen karakterler ve dönen reaktör halkaları istersen **Ayarlar → Arka plan → Canlı animasyonlar** ile açılır (daha çok pil yer).
+SpaceCast varsayılan olarak **pil dostu** çalışır. Karakterler yürür, durup etrafa bakar, nefes alır; reaktör atar, halkaları döner; kablolar akar, yıldızlar parlar. Ama bunların hepsi piksel oyunlardaki gibi saniyede ~6-7 karelik tek bir döngüyle yapılır (`src/life.ts`): ekran kartı saniyede 60 kez değil, yalnızca bu karelerde birkaç küçük öğeyi günceller, aradaki zamanda boşta kalır. Bulanıklık, hareketli filtre gibi pahalı efektler kullanılmaz; pencere gizliyken ya da bir panel açıkken döngü durur. Akıcı 60 karelik animasyonlar istersen **Ayarlar → Arka plan → Canlı animasyonlar** ile açılır (daha çok pil yer).
 
 ## Güvenlik ve gizlilik
 

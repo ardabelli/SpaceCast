@@ -816,7 +816,10 @@ body.pip .chat, .widget-shell .chat {
 .station { position: relative; width: 112px; height: 104px; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
 .prop-wrap { height: 54px; display: flex; align-items: flex-end; justify-content: center; filter: brightness(0.8) saturate(0.85); transition: filter 0.3s; }
 .prop-wrap.on { filter: brightness(1.12) drop-shadow(0 0 6px color-mix(in srgb, var(--tc) 55%, transparent)); }
-.npc-wrap { position: relative; margin-top: -26px; z-index: 1; height: 66px; display: flex; align-items: flex-end; filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.45)); }
+.npc-wrap { position: relative; margin-top: -26px; z-index: 1; height: 66px; display: flex; align-items: flex-end; }
+/* Ayak gölgesi: filtre yerine basit bir leke (hareket ederken yeniden hesaplanmaz) */
+.npc-wrap::before { content: ''; position: absolute; left: 50%; bottom: -2px; width: 30px; height: 6px; margin-left: -15px; border-radius: 50%; background: rgba(0, 0, 0, 0.45); }
+.npc-wrap .npc { position: relative; }
 .npc-wrap.idle { animation: breathe 2.6s steps(2) infinite; }
 @keyframes breathe { 50% { transform: translateY(1px); } }
 .npc-wrap.work { animation: patrol 6s linear infinite; }
@@ -1046,6 +1049,4 @@ body:not(.lively) *, body:not(.lively) *::before, body:not(.lively) *::after { a
 body:not(.lively) .starlayer { inset: 0; will-change: auto; }
 body:not(.lively) .world, body:not(.lively) .knight { will-change: auto; }
 body:not(.lively) .blink, body:not(.lively) .ctab-dot.busy { animation: blink 1s steps(2) infinite !important; }
-body:not(.lively) .corridors .pipe-lane.hot { animation: lane 2s steps(4) infinite !important; }
-body:not(.lively) .corridors .pipe-lane.in.hot { animation-direction: reverse !important; }
-body:not(.lively) .reactor-room.overload .orb { animation: core-pulse 1.2s steps(2) infinite !important; }
+/* Hareketin geri kalanı src/life.ts'teki saniyede ~6-7 karelik döngüden gelir */

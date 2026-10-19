@@ -1,6 +1,7 @@
 // Dijital ikiz: kullanıcının yapay zekâ ikizi. Sohbetten gelen isteği yorumlar, ekiplere görev olarak dağıtır
 // ve olup biteni sohbete raporlar. Şimdilik kural tabanlı; gerçek ajanlara geçince burası bir model çağrısı olacak.
 
+import { chatOf, pushMessage } from './chats.ts';
 import type { AppState, ChatMsg, Mission, Task } from './types.ts';
 
 const uid = (p = '') => p + Math.random().toString(36).slice(2, 10);
@@ -9,9 +10,10 @@ export function twinOf(s: AppState) {
   return s.agents.find((a) => a.kind === 'twin');
 }
 
-export function twinSay(s: AppState, text: string, extra: Partial<ChatMsg> = {}) {
-  s.chat.push({ id: uid('c-'), ts: Date.now(), from: 'twin', text, ...extra });
-  if (s.chat.length > 300) s.chat.splice(0, s.chat.length - 300);
+/** İkizin mesajı: verilen sohbete, yoksa görevin açıldığı sohbete, o da yoksa en son sohbete yazılır. */
+export function twinSay(s: AppState, text: string, extra: Partial<ChatMsg> = {}, chatId?: string) {
+  const id = chatId ?? (extra.missionId ? s.missions.find((m) => m.id === extra.missionId)?.chatId : undefined);
+  pushMessage(chatOf(s, id), { id: uid('c-'), ts: Date.now(), from: 'twin', text, ...extra });
 }
 
 const TEAM_WORDS: Record<string, string[]> = {

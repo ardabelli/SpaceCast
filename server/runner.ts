@@ -8,7 +8,8 @@
 import { copyFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { log, newTask, startMission, uid } from '../shared/engine.ts';
-import { KINDS } from '../shared/meta.ts';
+import { chatOf } from '../shared/chats.ts';
+import { KINDS, RECOMMENDED_EFFORT } from '../shared/meta.ts';
 import { twinOf, twinSay } from '../shared/twin.ts';
 import type { Agent, AppState, Attachment, Grant, Mission, Task } from '../shared/types.ts';
 import { runAgent, type Killable } from './ai.ts';
@@ -23,6 +24,13 @@ export interface Host {
 }
 
 const MAX_PARALLEL = 3;
+/** Aynı anda en fazla bu kadar sohbete cevap hazırlanır. */
+const MAX_TWIN = 2;
+
+/** Ajanın düşünme seviyesi: elle seçilmişse o, değilse bu çağrı için önerilen. */
+function effortOf(a: Agent, recommended: 'low' | 'medium' | 'high') {
+  return a.effort && a.effort !== 'auto' ? a.effort : recommended;
+}
 
 const finished = (t: Task) => t.status === 'done' || t.status === 'skipped';
 
@@ -114,14 +122,14 @@ function baseSummary(s: AppState) {
 
 export class Runner {
   private inflight = new Map<string, Killable | null>();
-  private twinStartedAt: string | undefined;
+  private twinStartedAt = new Map<string, string | undefined>();
   private host: Host;
 
   constructor(host: Host) {
     this.host = host;
     // Sunucu yeniden başladıysa yarıda kalan gerçek görevleri baştan al.
     host.update((s) => {
-      s.twinBusy = s.mode === 'real' && s.chat.at(-1)?.from === 'user';
+      for (const c of s.chats) c.busy = s.mode === 'real' && c.messages.at(-1)?.from === 'user';
       for (const t of s.tasks) if (t.real && (t.status === 'planning' || t.status === 'running')) t.status = 'pending';
     });
   }
@@ -135,13 +143,19 @@ export class Runner {
     const s = this.host.get();
     if (!settings().done) {
       // Kurulum bitmeden yapay zekâ sağlayıcısı yok: bekleyen mesaja kısa bir yönlendirme yaz.
-      if (s.twinBusy) this.host.update((d) => { d.twinBusy = false; twinSay(d, 'Önce kurulumu tamamla: yapay zekâ sağlayıcısını seçince hemen başlıyorum.'); });
+      for (const c of s.chats.filter((x) => x.busy)) {
+        this.host.update((d) => { chatOf(d, c.id).busy = false; twinSay(d, 'Önce kurulumu tamamla: yapay zekâ sağlayıcısını seçince hemen başlıyorum.', {}, c.id); });
+      }
       return;
     }
 
     // İptal edilen / silinen görevlerin süreçlerini durdur.
     for (const [key, child] of this.inflight) {
-      if (key === 'twin') continue;
+      if (key.startsWith('twin:')) {
+        // Silinen sohbetin cevabını beklemeye gerek yok
+        if (!s.chats.some((c) => `twin:${c.id}` === key)) { child?.kill(); this.inflight.delete(key); }
+        continue;
+      }
       const t = s.tasks.find((x) => x.id === key);
       const m = t && s.missions.find((x) => x.id === t.missionId);
       if (!t || !m || m.status === 'cancelled' || t.status === 'skipped') {
@@ -150,7 +164,10 @@ export class Runner {
       }
     }
 
-    if (s.twinBusy && !this.inflight.has('twin')) this.thinkTwin();
+    for (const c of s.chats) {
+      const thinking = [...this.inflight.keys()].filter((k) => k.startsWith('twin:')).length;
+      if (c.busy && !this.inflight.has(`twin:${c.id}`) && thinking < MAX_TWIN) this.thinkTwin(c.id);
+    }
 
     for (const m of s.missions) {
       if (!m.real || m.status !== 'running') continue;
@@ -161,26 +178,28 @@ export class Runner {
 
   // ------------------------------------------------------------ dijital ikiz
 
-  private thinkTwin() {
+  private thinkTwin(chatId: string) {
     const s = this.host.get();
     const twin = twinOf(s);
+    const chat = s.chats.find((c) => c.id === chatId);
+    if (!chat) return;
     if (!twin) {
-      this.host.update((d) => { d.twinBusy = false; twinSay(d, 'Dijital ikiz ajanı bulunamadı.'); });
+      this.host.update((d) => { chatOf(d, chatId).busy = false; twinSay(d, 'Dijital ikiz ajanı bulunamadı.', {}, chatId); });
       return;
     }
-    const lastId = s.chat.at(-1)?.id;
-    this.twinStartedAt = lastId;
+    const lastId = chat.messages.at(-1)?.id;
+    this.twinStartedAt.set(chatId, lastId);
     const teamIds = s.teams.filter((t) => s.agents.some((a) => a.teamId === t.id && a.managerId === twin.id)).map((t) => t.id);
 
     // Cevaplanmamış kullanıcı mesajları (ikizin son mesajından sonrakiler) ve ekleri
-    let i = s.chat.length;
-    while (i > 0 && s.chat[i - 1].from === 'user') i--;
-    const unanswered = s.chat.slice(i);
+    let i = chat.messages.length;
+    while (i > 0 && chat.messages[i - 1].from === 'user') i--;
+    const unanswered = chat.messages.slice(i);
     const files = unanswered.flatMap((c) => c.attachments ?? []);
     const voice = unanswered.some((c) => c.voice);
 
     // Token tasarrufu: son 12 mesaj; eski uzun cevaplar kısaltılır.
-    const history = s.chat
+    const history = chat.messages
       .slice(-12)
       .map((c, k, arr) => {
         const recent = k >= arr.length - unanswered.length;
@@ -254,31 +273,34 @@ export class Runner {
       allow: needsTools ? ['Read', 'Glob', 'Grep', ...acc.writeRules] : undefined,
       addDirs: needsTools ? [this.host.uploads, this.host.workspaces, ...acc.addDirs] : undefined,
       schema,
-      effort: files.length ? 'medium' : 'low',
+      // Görsel ya da dosya varsa önerilen seviye bir kademe yukarı
+      effort: effortOf(twin, files.length ? 'medium' : RECOMMENDED_EFFORT.twin),
       timeoutMs: 5 * 60_000,
     });
-    this.inflight.set('twin', child);
+    const key = `twin:${chatId}`;
+    this.inflight.set(key, child);
     done.then((r) => {
-      this.inflight.delete('twin');
+      this.inflight.delete(key);
       this.host.update((d) => {
         this.charge(d, twin.id, r);
-        const again = d.chat.at(-1)?.from === 'user' && d.chat.at(-1)?.id !== this.twinStartedAt;
-        d.twinBusy = again;
+        const c = d.chats.find((x) => x.id === chatId);
+        if (!c) return;
+        c.busy = c.messages.at(-1)?.from === 'user' && c.messages.at(-1)?.id !== this.twinStartedAt.get(chatId);
         if (!r.ok || !r.structured) {
-          twinSay(d, `Yapay zekâ sağlayıcısına ulaşamadım: ${r.error ?? 'boş cevap'}. Ayarlar'dan sağlayıcıyı ve bağlantıyı kontrol edebilirsin.`);
+          twinSay(d, `Yapay zekâ sağlayıcısına ulaşamadım: ${r.error ?? 'boş cevap'}. Ayarlar'dan sağlayıcıyı ve bağlantıyı kontrol edebilirsin.`, {}, chatId);
           return;
         }
         const out = r.structured as { reply: string; action: string; mission?: { title: string; brief: string; teamIds: string[] } };
         let missionId: string | undefined;
-        if (out.action === 'mission' && out.mission) missionId = this.openMission(d, out.mission, files);
+        if (out.action === 'mission' && out.mission) missionId = this.openMission(d, out.mission, files, chatId);
         if (out.action === 'pause') for (const m of d.missions) if (m.status === 'running') m.status = 'paused';
         if (out.action === 'resume') for (const m of d.missions) if (m.status === 'paused') m.status = 'running';
-        twinSay(d, out.reply, missionId ? { missionId } : {});
+        twinSay(d, out.reply, missionId ? { missionId } : {}, chatId);
       });
     });
   }
 
-  private openMission(d: AppState, spec: { title: string; brief: string; teamIds: string[] }, files: Attachment[] = []) {
+  private openMission(d: AppState, spec: { title: string; brief: string; teamIds: string[] }, files: Attachment[] = [], chatId?: string) {
     const twin = twinOf(d)!;
     const leads = d.agents.filter((a) => a.managerId === twin.id && !a.paused);
     let targets = leads.filter((l) => l.teamId && spec.teamIds.includes(l.teamId));
@@ -290,6 +312,7 @@ export class Runner {
       ownerId: twin.id,
       targets: targets.map((t) => t.id),
       attachments: files.length ? files : undefined,
+      chatId,
       status: 'running',
       createdAt: Date.now(),
     };
@@ -443,7 +466,7 @@ export class Runner {
       required: ['plan', 'subtasks'],
       additionalProperties: false,
     };
-    const { child, done } = runAgent({ prompt, systemPrompt: identity(s, a), model: a.model, cwd: m.workspace ?? this.host.workspaces, tools: [], schema, effort: 'low', timeoutMs: 5 * 60_000 });
+    const { child, done } = runAgent({ prompt, systemPrompt: identity(s, a), model: a.model, cwd: m.workspace ?? this.host.workspaces, tools: [], schema, effort: effortOf(a, 'low'), timeoutMs: 5 * 60_000 });
     this.inflight.set(taskId, child);
     done.then((r) => {
       this.inflight.delete(taskId);
@@ -525,7 +548,7 @@ export class Runner {
       allow,
       addDirs: acc.addDirs,
       schema,
-      effort: 'medium',
+      effort: effortOf(a, RECOMMENDED_EFFORT[a.kind]),
       maxBudgetUsd: remaining,
       onEvent: (e) =>
         this.host.update((d) => {
@@ -605,7 +628,7 @@ export class Runner {
       x.steps.push({ text: 'Ekibin sonuçlarını birleştiriyor' });
       x.stepIndex = x.steps.length - 1;
     });
-    const { child, done } = runAgent({ prompt, systemPrompt: identity(s, a), model: a.model, cwd: m.workspace ?? this.host.workspaces, tools: [], effort: 'low', timeoutMs: 5 * 60_000 });
+    const { child, done } = runAgent({ prompt, systemPrompt: identity(s, a), model: a.model, cwd: m.workspace ?? this.host.workspaces, tools: [], effort: effortOf(a, 'low'), timeoutMs: 5 * 60_000 });
     this.inflight.set(taskId, child);
     done.then((r) => {
       this.inflight.delete(taskId);

@@ -32,6 +32,28 @@ export const KINDS: Record<AgentKind, { label: string; emoji: string }> = {
   custom: { label: 'Özel', emoji: '🤖' },
 };
 
+/** Düşünme seviyesi: yüksek seviye daha iyi düşünür ama yavaştır ve daha çok token harcar. */
+export const EFFORTS: Record<'low' | 'medium' | 'high', { label: string; hint: string }> = {
+  low: { label: 'Düşük', hint: 'Hızlı ve az token: sohbet, planlama, özet, basit işler' },
+  medium: { label: 'Orta', hint: 'Dengeli: araştırma, yazı ve çoğu kod işi' },
+  high: { label: 'Yüksek', hint: 'Derin düşünür: zor kod ve analiz; yavaş, daha çok token' },
+};
+
+/** Role göre önerilen düşünme seviyesi ("Önerilen" seçiliyken kullanılır). */
+export const RECOMMENDED_EFFORT: Record<AgentKind, 'low' | 'medium' | 'high'> = {
+  twin: 'low',
+  commander: 'low',
+  lead: 'low',
+  dev: 'medium',
+  qa: 'low',
+  devops: 'low',
+  research: 'medium',
+  analyst: 'medium',
+  trader: 'low',
+  writer: 'medium',
+  custom: 'medium',
+};
+
 export const MODELS: Record<ModelId, { label: string; costPerTick: number; tokensPerTick: number }> = {
   'claude-opus-5-5': { label: 'Opus 5.5', costPerTick: 0.045, tokensPerTick: 2400 },
   'claude-sonnet-5-5': { label: 'Sonnet 5.5', costPerTick: 0.018, tokensPerTick: 1800 },

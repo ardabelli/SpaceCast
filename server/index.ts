@@ -13,7 +13,7 @@ import { WebSocketServer, WebSocket } from 'ws';
 import { reduce, tick } from '../shared/engine.ts';
 import { PROVIDERS } from '../shared/providers.ts';
 import { STATE_VERSION, TWIN_ID, applyNames, seedState } from '../shared/seed.ts';
-import type { AppState, ClientMsg, ServerMsg } from '../shared/types.ts';
+import type { AppState, ChatMsg, ClientMsg, ServerMsg } from '../shared/types.ts';
 import { providerModels, testProvider } from './ai.ts';
 import { claudeInfo, claudeLogin } from './claude.ts';
 import { Uploads, checkGrantPath, grantId } from './files.ts';
@@ -47,6 +47,15 @@ function loadState(): AppState {
         // v2 → v3: gerçek mod alanı eklendi
         saved.mode = 'sim';
         saved.version = 3;
+      }
+      if (saved.version === 3) {
+        // v3 → v4: tek sohbet yerine sekmeli sohbetler
+        const old = saved as AppState & { chat?: ChatMsg[]; twinBusy?: boolean };
+        const msgs = old.chat ?? [];
+        saved.chats = [{ id: 'k-0', title: 'Sohbet', createdAt: msgs[0]?.ts ?? Date.now(), updatedAt: msgs.at(-1)?.ts ?? Date.now(), messages: msgs, busy: !!old.twinBusy }];
+        delete old.chat;
+        delete old.twinBusy;
+        saved.version = 4;
       }
       saved.grants ??= [];
       // Eski kayıtlarda ekip ikonları emojiydi; çizgi ikon adlarına çevir.

@@ -18,6 +18,12 @@ const PATHS: Record<string, ReactNode> = {
     </>
   ),
   stop: <rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor" />,
+  plus: (
+    <>
+      <path d="M12 5v14" />
+      <path d="M5 12h14" />
+    </>
+  ),
   power: (
     <>
       <path d="M12 2v10" />

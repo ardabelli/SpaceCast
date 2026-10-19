@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import type { PublicSettings, SystemInfo } from '../shared/providers.ts';
 import { TWIN_ID } from '../shared/seed.ts';
-import type { Action, AppState, ClaudeInfo, ServerMsg } from '../shared/types.ts';
+import type { Action, AppState, ClaudeInfo, Conversation, ServerMsg } from '../shared/types.ts';
 
 export type View = 'base' | 'twin' | 'map' | 'teams' | 'missions' | 'approvals' | 'logs';
 const VIEWS: View[] = ['base', 'twin', 'map', 'teams', 'missions', 'approvals', 'logs'];
@@ -21,6 +21,10 @@ interface Store {
   /** Uzaktan bağlanılıyor ve erişim kodu yok/yanlış */
   needsKey: boolean;
   toast: string | null;
+  /** Bu cihazda açık olan sohbet sekmesi */
+  activeChatId: string | null;
+  /** Sohbetlerin bu cihazda en son görüldüğü an (okunmamış işareti için) */
+  seen: Record<string, number>;
   view: View;
   selectedAgentId: string | null;
   selectedMissionId: string | null;
@@ -30,7 +34,14 @@ interface Store {
   selectAgent: (id: string | null) => void;
   selectMission: (id: string | null) => void;
   openModal: (m: Store['modal']) => void;
+  setActiveChat: (id: string) => void;
+  markSeen: (marks: Record<string, number>) => void;
 }
+
+const CHAT_KEY = 'sc-chat';
+const SEEN_KEY = 'sc-seen';
+const load = <T,>(k: string, d: T): T => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } };
+const keep = (k: string, v: unknown) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* özel pencere */ } };
 
 const KEY_STORAGE = 'army-key';
 
@@ -94,6 +105,8 @@ export const useStore = create<Store>((set, get) => ({
   local: false,
   needsKey: false,
   toast: null,
+  activeChatId: load<string | null>(CHAT_KEY, null),
+  seen: load<Record<string, number>>(SEEN_KEY, {}),
   view: VIEWS.includes(location.hash.slice(1) as View) ? (location.hash.slice(1) as View) : 'base',
   selectedAgentId: null,
   selectedMissionId: null,
@@ -110,7 +123,21 @@ export const useStore = create<Store>((set, get) => ({
   selectAgent: (id) => set({ selectedAgentId: id }),
   selectMission: (id) => set({ selectedMissionId: id }),
   openModal: (modal) => set({ modal }),
+  setActiveChat: (id) => { keep(CHAT_KEY, id); set({ activeChatId: id }); },
+  markSeen: (marks) => {
+    const seen = { ...get().seen, ...marks };
+    keep(SEEN_KEY, seen);
+    set({ seen });
+  },
 }));
+
+/** Bu cihazda açık sohbet; seçili sohbet silindiyse en son kullanılan. */
+export function useActiveChat(): Conversation {
+  return useStore((x) => {
+    const chats = x.state!.chats;
+    return chats.find((c) => c.id === x.activeChatId) ?? chats.reduce((a, b) => (b.updatedAt > a.updatedAt ? b : a));
+  });
+}
 
 /** Sunucu API çağrısı (erişim anahtarıyla). Hata durumunda sunucunun mesajını fırlatır. */
 export async function api<T = any>(path: string, body?: unknown): Promise<T> {

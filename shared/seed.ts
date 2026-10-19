@@ -1,7 +1,8 @@
+import { newChat } from './chats.ts';
 import { layoutTree } from './meta.ts';
 import type { Agent, AppState, Team } from './types.ts';
 
-export const STATE_VERSION = 3;
+export const STATE_VERSION = 4;
 export const TWIN_ID = 'a-twin';
 export const DEFAULT_TWIN_NAME = 'Nova';
 
@@ -21,9 +22,10 @@ function introText(twinName: string, userName: string) {
 export function applyNames(s: AppState, twinName: string, userName: string) {
   const twin = s.agents.find((a) => a.id === TWIN_ID);
   if (twin) twin.name = twinName;
-  if (s.chat.length === 1 && s.chat[0].id === 'c-0') s.chat[0].text = introText(twinName, userName);
-  const first = s.logs.find((l) => l.id === 'l-0');
-  if (first) first.text = `Üs çevrimiçi. ${twinName} emirlerini bekliyor.`;
+  const first = s.chats[0]?.messages;
+  if (first?.length === 1 && first[0].id === 'c-0') first[0].text = introText(twinName, userName);
+  const log0 = s.logs.find((l) => l.id === 'l-0');
+  if (log0) log0.text = `Üs çevrimiçi. ${twinName} emirlerini bekliyor.`;
 }
 
 type Seed = Pick<Agent, 'id' | 'name' | 'emoji' | 'role' | 'kind' | 'model' | 'teamId' | 'managerId'> & Partial<Agent>;
@@ -90,7 +92,7 @@ export function seedState(): AppState {
     tasks: [],
     approvals: [],
     logs: [{ id: 'l-0', ts: Date.now(), type: 'system', text: `Üs çevrimiçi. ${DEFAULT_TWIN_NAME} emirlerini bekliyor.` }],
-    chat: [{ id: 'c-0', ts: Date.now(), from: 'twin', text: introText(DEFAULT_TWIN_NAME, '') }],
+    chats: [{ ...newChat('k-0', 'İlk sohbet'), messages: [{ id: 'c-0', ts: Date.now(), from: 'twin', text: introText(DEFAULT_TWIN_NAME, '') }] }],
     grants: [],
     sim: { running: true, speed: 1 },
     mode: 'real',

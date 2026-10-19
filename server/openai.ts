@@ -38,14 +38,30 @@ export async function listModels(e: Omit<Endpoint, 'model'>): Promise<string[]> 
   return [...new Set(ids)].sort();
 }
 
-async function chat(e: Endpoint, body: object, signal: AbortSignal) {
-  const r = await fetch(`${e.baseUrl}/chat/completions`, { method: 'POST', headers: headers(e), body: JSON.stringify({ model: e.model, ...body }), signal });
-  if (!r.ok) {
-    const err = new Error(await errorText(r)) as Error & { status: number };
-    err.status = r.status;
-    throw err;
+/** Düşünme seviyesini (reasoning_effort) reddeden modeller: bir kez reddedince bir daha gönderilmez. */
+const NO_EFFORT = new Set<string>();
+
+async function chat(e: Endpoint, body: object, signal: AbortSignal, effort?: string) {
+  const post = async (b: object) => {
+    const r = await fetch(`${e.baseUrl}/chat/completions`, { method: 'POST', headers: headers(e), body: JSON.stringify({ model: e.model, ...b }), signal });
+    if (!r.ok) {
+      const err = new Error(await errorText(r)) as Error & { status: number };
+      err.status = r.status;
+      throw err;
+    }
+    return (await r.json()) as any;
+  };
+  const key = `${e.baseUrl}|${e.model}`;
+  if (!effort || NO_EFFORT.has(key)) return post(body);
+  try {
+    return await post({ ...body, reasoning_effort: effort });
+  } catch (err: any) {
+    if (err?.status !== 400 && err?.status !== 422) throw err;
+    // Seviyesiz de hata verirse sorun seviye değildir: hata aynen yukarı gider, model işaretlenmez
+    const r = await post(body);
+    NO_EFFORT.add(key);
+    return r;
   }
-  return (await r.json()) as any;
 }
 
 /** Kısa bir deneme isteği: anahtar ve model çalışıyor mu. */
@@ -288,7 +304,7 @@ export function runOpenAI(o: RunOptions, e: Endpoint): { child: { kill: () => vo
       for (let turn = 0; turn < maxTurns; turn++) {
         // Araçsız ve şemalı çağrılarda tek seferde yapılandırılmış cevap iste
         if (!tools.length && o.schema) break;
-        const j = await chat(e, tools.length ? { messages, tools, tool_choice: 'auto' } : { messages }, abort.signal);
+        const j = await chat(e, tools.length ? { messages, tools, tool_choice: 'auto' } : { messages }, abort.signal, o.effort);
         count(j);
         const msg = j.choices?.[0]?.message ?? {};
         const calls: any[] = msg.tool_calls ?? [];
@@ -333,7 +349,7 @@ export function runOpenAI(o: RunOptions, e: Endpoint): { child: { kill: () => vo
         try {
           const msgs = [...messages];
           msgs[0] = { role: 'system', content: `${system}\n\n${schemaNote}` };
-          const j = await chat(e, { messages: msgs, ...extra }, abort.signal);
+          const j = await chat(e, { messages: msgs, ...extra }, abort.signal, o.effort);
           count(j);
           const content = String(j.choices?.[0]?.message?.content ?? '');
           const structured = parseJson(content);

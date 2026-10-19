@@ -8,7 +8,9 @@ import { Icon } from '../icons.tsx';
 import { openFloating } from '../widget.tsx';
 import { Npc } from '../npc.tsx';
 import { knight } from '../pixelart.ts';
-import { fileUrl, getKey, showToast, useAppState, useStore, useTwinName } from '../store.ts';
+import { fileUrl, getKey, showToast, useActiveChat, useAppState, useStore, useTwinName } from '../store.ts';
+import { ChatTabs } from './ChatTabs.tsx';
+import { EffortPicker } from './EffortPicker.tsx';
 import { clock } from '../ui.tsx';
 import { listen, speak, stopSpeaking, sttSupport, ttsSupported } from '../voice.ts';
 
@@ -73,28 +75,33 @@ export function Chat({ docked, widget }: { docked?: boolean; widget?: boolean })
   const list = useRef<HTMLDivElement>(null);
   const twin = twinOf(s);
   const twinName = useTwinName();
-  const last = s.chat.at(-1);
-  const first = useRef(true);
-  const spoken = useRef(last?.id);
+  const chat = useActiveChat();
+  const msgs = chat.messages;
+  const last = msgs.at(-1);
+  const shownChat = useRef<string | null>(null);
+  const spoken = useRef({ chat: chat.id, id: last?.id });
 
   useEffect(() => {
-    list.current?.scrollTo({ top: list.current.scrollHeight, behavior: first.current ? 'auto' : 'smooth' });
-    first.current = false;
-  }, [last?.id, s.twinBusy]);
+    // Sekme değişince hemen en alta, aynı sohbette yeni mesaj gelince yumuşakça kaydır
+    const jump = shownChat.current !== chat.id;
+    shownChat.current = chat.id;
+    list.current?.scrollTo({ top: list.current.scrollHeight, behavior: jump ? 'auto' : 'smooth' });
+  }, [chat.id, last?.id, chat.busy]);
 
   // İkizin yeni cevabını sesli oku: hoparlör açıksa ya da kullanıcı son mesajı sesle söylediyse.
   useEffect(() => {
-    if (!last || last.id === spoken.current) return;
-    spoken.current = last.id;
+    if (spoken.current.chat !== chat.id) { spoken.current = { chat: chat.id, id: last?.id }; return; }
+    if (!last || last.id === spoken.current.id) return;
+    spoken.current.id = last.id;
     if (last.from !== 'twin' || last.approvalId) return;
-    const prevUser = [...s.chat].reverse().find((c) => c.from === 'user');
+    const prevUser = [...msgs].reverse().find((c) => c.from === 'user');
     if (tts || prevUser?.voice) speak(last.text);
-  }, [last?.id]);
+  }, [chat.id, last?.id]);
 
   const send = (t = text, voice = false) => {
     if (!t.trim() && !files.length) return;
     stopSpeaking();
-    dispatch({ type: 'chat/send', id: uid('c-'), text: t.trim(), attachments: files.length ? files : undefined, voice });
+    dispatch({ type: 'chat/send', id: uid('c-'), chatId: chat.id, text: t.trim(), attachments: files.length ? files : undefined, voice });
     setText('');
     setFiles([]);
   };
@@ -137,7 +144,7 @@ export function Chat({ docked, widget }: { docked?: boolean; widget?: boolean })
   };
 
   const status = twin ? agentStatus(s, twin.id) : 'idle';
-  const thinking = !!s.twinBusy;
+  const thinking = !!chat.busy;
 
   return (
     <div className={`chat ${docked ? 'docked' : ''} ${widget ? 'widget' : ''}`}>
@@ -170,12 +177,13 @@ export function Chat({ docked, widget }: { docked?: boolean; widget?: boolean })
             <button className="icon-btn" onClick={() => go('twin')} title="Tam ekran"><Icon name="expand" size={16} /></button>
           </>
         ) : (
-          <button className="btn sm ghost" onClick={() => confirm('Sohbet geçmişi silinsin mi?') && dispatch({ type: 'chat/clear' })}>Temizle</button>
+          twin && <EffortPicker agent={twin} compact />
         )}
       </div>
+      <ChatTabs />
 
       <div className="chat-list" ref={list}>
-        {s.chat.map((m) => (
+        {msgs.map((m) => (
           <Message key={m.id} m={m} onMission={(id) => { selectMission(id); go('missions'); }} />
         ))}
         {thinking && (
@@ -186,7 +194,7 @@ export function Chat({ docked, widget }: { docked?: boolean; widget?: boolean })
         )}
       </div>
 
-      {s.chat.length < 4 && !files.length && (
+      {msgs.length < 4 && !files.length && (
         <div className="chat-sugg">
           {SUGGESTIONS.map((t) => (
             <button key={t} className="chip" onClick={() => send(t)}>{t}</button>

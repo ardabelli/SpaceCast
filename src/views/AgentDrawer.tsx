@@ -6,6 +6,7 @@ import type { Agent, AgentKind, Autonomy, ModelId } from '../../shared/types.ts'
 import { createAgent } from '../actions.ts';
 import { useAppState, useStore } from '../store.ts';
 import { Avatar, Bar, StatusBadge, kfmt, modelLabel, money } from '../ui.tsx';
+import { EffortPicker } from './EffortPicker.tsx';
 import { Feed } from './Logs.tsx';
 
 /** Metin alanları yazarken sunucuya her tuşta gitmesin diye yerel taslak tutar, odaktan çıkınca kaydeder. */
@@ -122,6 +123,8 @@ export function AgentDrawer({ id }: { id: string }) {
               </select>
             </label>
           </div>
+
+          <EffortPicker agent={a} />
 
           <div className="field">
             <span>Yetki</span>

@@ -953,3 +953,30 @@ body.pip .chat, .widget-shell .chat {
   .setup-card { padding: 20px 16px; }
   .prov-grid { grid-template-columns: 1fr 1fr; }
 }
+
+/* ---------------------------------------------------------------- sohbet sekmeleri, düşünme seviyesi */
+
+.chat-tabs {
+  display: flex; align-items: center; gap: 4px; padding: 6px 10px; overflow-x: auto; scrollbar-width: none;
+  border-bottom: 1px solid var(--line); background: rgba(16, 19, 36, 0.45); flex: none;
+}
+.chat-tabs::-webkit-scrollbar { display: none; }
+.ctab {
+  display: flex; align-items: center; gap: 6px; flex: none; max-width: 180px; height: 28px; padding: 0 10px;
+  border: 1px solid transparent; border-radius: 7px; color: var(--muted); font-size: 12.5px; cursor: pointer; user-select: none;
+}
+.ctab:hover { color: var(--text); background: rgba(255, 255, 255, 0.04); }
+.ctab.on { color: var(--text); background: var(--panel-3); border-color: var(--line-2); }
+.ctab-dot { flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+.ctab-dot.busy { background: var(--warn); animation: blink 1s steps(2) infinite; }
+.ctab-x { flex: none; display: grid; place-items: center; width: 18px; height: 18px; margin-right: -4px; border: 0; border-radius: 4px; background: transparent; color: var(--dim); }
+.ctab-x:hover { color: var(--bad); background: rgba(239, 107, 107, 0.12); }
+.ctab-add { flex: none; display: grid; place-items: center; width: 28px; height: 28px; border: 1px dashed var(--line-2); border-radius: 7px; background: transparent; color: var(--muted); }
+.ctab-add:hover { color: var(--accent); border-color: var(--accent); }
+
+.effort-sel {
+  height: 30px; max-width: 220px; padding: 0 8px; border: 1px solid var(--line-2); border-radius: 7px;
+  background: rgba(5, 6, 12, 0.6); color: var(--muted); font-size: 12px;
+}
+.effort-sel:hover, .effort-sel:focus { color: var(--text); border-color: var(--accent); outline: none; }
+@media (max-width: 720px) { .effort-sel { max-width: 130px; } }

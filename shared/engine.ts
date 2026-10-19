@@ -3,6 +3,7 @@
 
 import { MODELS, RESULTS, layoutTree, stepsFor } from './meta.ts';
 import { seedState } from './seed.ts';
+import { NEW_CHAT_TITLE, chatOf, newChat, pushMessage, trimChats } from './chats.ts';
 import { twinRespond, twinSay } from './twin.ts';
 import type { Action, Agent, AppState, LogEntry, Mission, Task } from './types.ts';
 
@@ -146,9 +147,10 @@ export function reduce(prev: AppState, action: Action): AppState {
       const text = action.text.trim().slice(0, 4000);
       const attachments = action.attachments?.slice(0, 10);
       if (!text && !attachments?.length) break;
-      s.chat.push({ id: action.id, ts: Date.now(), from: 'user', text, attachments, voice: action.voice || undefined });
-      // Gerçek modda cevabı sunucu Claude'dan alır (server/runner.ts).
-      if (s.mode === 'real') s.twinBusy = true;
+      const chat = chatOf(s, action.chatId);
+      pushMessage(chat, { id: action.id, ts: Date.now(), from: 'user', text, attachments, voice: action.voice || undefined });
+      // Gerçek modda cevabı sunucu yapay zekâ sağlayıcısından alır (server/runner.ts).
+      if (s.mode === 'real') chat.busy = true;
       else if (text) twinRespond(s, text, startMission, (m, ownerId) => newTask(m, null, agent(ownerId)!, m.title));
       if (s.mode !== 'real' && attachments?.length) twinSay(s, 'Ekleri aldım. Görselleri ve dosyaları inceleyebilmem için üstten Gerçek moda geçmen gerekiyor.');
       break;
@@ -173,9 +175,27 @@ export function reduce(prev: AppState, action: Action): AppState {
       log(s, { type: 'system', text: action.mode === 'real' ? 'GERÇEK MOD: ajanlar artık Claude ile çalışıyor' : 'SİMÜLASYON MODU' });
       break;
 
-    case 'chat/clear':
-      s.chat = [];
+    case 'chat/new':
+      if (!s.chats.some((c) => c.id === action.id)) s.chats.push(newChat(action.id));
+      trimChats(s);
       break;
+
+    case 'chat/rename': {
+      const c = s.chats.find((x) => x.id === action.id);
+      if (c) c.title = action.title.replace(/\s+/g, ' ').trim().slice(0, 40) || NEW_CHAT_TITLE;
+      break;
+    }
+
+    case 'chat/delete':
+      s.chats = s.chats.filter((c) => c.id !== action.id);
+      if (!s.chats.length) s.chats.push(newChat(uid('k-')));
+      break;
+
+    case 'chat/clear': {
+      const c = s.chats.find((x) => x.id === action.id);
+      if (c) { c.messages = []; c.busy = false; }
+      break;
+    }
 
     case 'team/pause':
       for (const a of s.agents) if (a.teamId === action.id) a.paused = action.paused;

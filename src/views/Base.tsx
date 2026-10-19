@@ -2,6 +2,7 @@
 // (laboratuvar, atölye, ticaret katı…), içlerinde rollerine göre giyinmiş NPC ajanlar.
 // Gözlemci kamerası: sürükle = gez, tekerlek/iki parmak = yakınlaş, odaya tıkla = odaklan.
 
+import { anyBusy } from '../../shared/chats.ts';
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { agentStatus, currentActivity, taskProgress, type AgentStatus } from '../../shared/engine.ts';
 import { THEMES, themeOf } from '../../shared/meta.ts';
@@ -264,7 +265,7 @@ export function Base() {
 function Reactor({ s, twin, box, running, onClick, onTalk }: { s: AppState; twin: Agent; box: Box; running: number; onClick: () => void; onTalk: () => void }) {
   const st = agentStatus(s, twin.id);
   const pending = s.approvals.filter((a) => a.status === 'pending').length;
-  const thinking = !!s.twinBusy;
+  const thinking = anyBusy(s);
   const power = Math.min(100, 18 + running * 22 + (thinking ? 25 : 0));
   const pulse = thinking ? 0.7 : running ? 1.3 : 3.2;
   const line = pending ? `${pending} karar seni bekliyor` : thinking ? 'hesaplıyor…' : running ? `${running} operasyona güç veriyor` : 'beklemede';

@@ -15,6 +15,8 @@ Her şey kendi bilgisayarında çalışır, telefondan da yönetebilirsin.
 ## Özellikler
 
 - **Dijital ikiz.** Adını sen koyarsın. Sohbet eder, işi anlar, doğru ekiplere görev açar ve bitince rapor verir.
+- **Sekmeli sohbetler.** İkizinle aynı anda birden fazla konuşma açabilirsin; her görevin raporu ve onay soruları, görevin başladığı sohbete düşer.
+- **Düşünme seviyesi.** Her ajan için *Önerilen / Düşük / Orta / Yüksek*. Önerilen seviye ajanın rolüne göre seçilir: sohbet ve planlama düşük, araştırma, yazı ve kod orta.
 - **Ajan ekipleri.** Hazır üç ekiple gelir (Uygulama Atölyesi, Ticaret Masası, Araştırma & İçerik); istediğin kadar ekip ve ajan ekleyebilirsin. Liderler işi ekibine aşamalar halinde böler, ekip aynı çalışma klasöründe birlikte çalışır.
 - **Gerçek iş.** Ajanlar web'de araştırır, dosya okur ve yazar, kod geliştirir. Çıktılar `data/workspaces` altındaki görev klasörlerinde durur.
 - **Onay kuyruğu.** Para harcamak, yayına almak, mesaj göndermek gibi geri alınamaz işler ajanlar tarafından yalnızca önerilir; sen onaylamadan yapılmaz.
@@ -82,11 +84,11 @@ Claude dışındaki sağlayıcılarda ajanlar dosya okuyup yazabilir ve web'de a
 | Sekme | Ne yapar |
 | --- | --- |
 | **Üs** | İstasyonun üstten görünümü. Ortada ikizinin reaktörü, etrafında ekip odaları. Sürükleyerek gez, tekerlekle yakınlaş, odaya tıklayıp terminalini aç. |
-| **İkizin** | Sohbet: iş ver, durum sor, "dur" ya da "devam" de, onayları buradan ver. Mikrofon, fotoğraf ve dosya ekleme burada. |
+| **İkizin** | Sohbet: iş ver, durum sor, "dur" ya da "devam" de, onayları buradan ver. Üstteki sekmelerden yeni sohbet aç (çift tıkla: yeniden adlandır). Sağ üstten ikizin düşünme seviyesini seç. Mikrofon, fotoğraf ve dosya ekleme burada. |
 | **Ağ** | Kim kime bağlı: bir ajanın alt noktasından diğerinin üst noktasına sürükle, onu yöneticisi yap. |
 | **Görevler** | Açılan görevler, alt işler ve çıktıların bulunduğu klasör. |
 | **Onaylar** | Ajanların senden onay beklediği işler. |
-| **Ekipler** | Ekip ve ajan ekle, düzenle; her ajanın modeli, araçları, yetkisi ve harcama limiti. |
+| **Ekipler** | Ekip ve ajan ekle, düzenle; her ajanın modeli, düşünme seviyesi, araçları, yetkisi ve harcama limiti. |
 | **Kayıtlar** | Her şeyin canlı akışı. |
 
 <table>

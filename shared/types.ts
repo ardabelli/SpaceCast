@@ -38,9 +38,13 @@ export interface Agent {
   spent: number;
   tokens: number;
   paused: boolean;
+  /** Düşünme seviyesi; 'auto' ya da boş = rolüne göre önerilen */
+  effort?: Effort;
   x: number;
   y: number;
 }
+
+export type Effort = 'auto' | 'low' | 'medium' | 'high';
 
 export interface Team {
   id: string;
@@ -108,6 +112,8 @@ export interface Mission {
   workspace?: string;
   /** Görevi doğuran mesajlardaki ekler (çalışma klasörüne kopyalanır) */
   attachments?: Attachment[];
+  /** Görevin açıldığı sohbet: rapor ve onay soruları buraya düşer */
+  chatId?: string;
   status: MissionStatus;
   createdAt: number;
   finishedAt?: number;
@@ -167,6 +173,17 @@ export interface ChatMsg {
   voice?: boolean;
 }
 
+/** İkizle ayrı bir sohbet (sekme). */
+export interface Conversation {
+  id: string;
+  title: string;
+  createdAt: number;
+  updatedAt: number;
+  messages: ChatMsg[];
+  /** İkiz bu sohbette cevap hazırlıyor */
+  busy?: boolean;
+}
+
 export interface AppState {
   version: number;
   agents: Agent[];
@@ -175,13 +192,11 @@ export interface AppState {
   tasks: Task[];
   approvals: Approval[];
   logs: LogEntry[];
-  chat: ChatMsg[];
+  chats: Conversation[];
   grants: Grant[];
   sim: { running: boolean; speed: number };
   /** sim: taklit · real: Claude Code ile gerçek ajanlar */
   mode: 'sim' | 'real';
-  /** İkiz şu an düşünüyor (gerçek mod) */
-  twinBusy?: boolean;
 }
 
 export type Action =
@@ -202,10 +217,13 @@ export type Action =
   | { type: 'sim/set'; running?: boolean; speed?: number }
   | { type: 'mode/set'; mode: 'sim' | 'real' }
   | { type: 'logs/clear' }
-  | { type: 'chat/send'; id: string; text: string; attachments?: Attachment[]; voice?: boolean }
+  | { type: 'chat/send'; id: string; chatId?: string; text: string; attachments?: Attachment[]; voice?: boolean }
+  | { type: 'chat/new'; id: string }
+  | { type: 'chat/rename'; id: string; title: string }
+  | { type: 'chat/delete'; id: string }
   | { type: 'grant/add'; grant: Grant }
   | { type: 'grant/remove'; id: string }
-  | { type: 'chat/clear' }
+  | { type: 'chat/clear'; id: string }
   | { type: 'demo/reset' };
 
 /** Sunucu → istemci mesajları */

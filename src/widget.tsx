@@ -4,6 +4,7 @@
 
 import { createRoot, type Root } from 'react-dom/client';
 import { TWIN_ID } from '../shared/seed.ts';
+import { applyAccent } from './accents.ts';
 import { showToast, useStore } from './store.ts';
 import { Chat } from './views/Chat.tsx';
 
@@ -38,6 +39,9 @@ export async function openFloating() {
     const w: Window = await (window as any).documentPictureInPicture.requestWindow({ width: 400, height: 620 });
     pip = w;
     copyStyles(w.document);
+    applyAccent(useStore.getState().accent, w.document);
+    const unsub = useStore.subscribe((s, prev) => { if (s.accent !== prev.accent) applyAccent(s.accent, w.document); });
+    w.addEventListener('pagehide', unsub);
     w.document.title = useStore.getState().state?.agents.find((a) => a.id === TWIN_ID)?.name ?? 'SpaceCast';
     w.document.documentElement.lang = 'tr';
     w.document.body.className = 'pip';

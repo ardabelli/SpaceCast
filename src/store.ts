@@ -27,6 +27,8 @@ interface Store {
   seen: Record<string, number>;
   /** Arka plan uzay teması (bu cihazda) */
   spaceTheme: string;
+  /** Vurgu rengi (bu cihazda) */
+  accent: string;
   view: View;
   selectedAgentId: string | null;
   selectedMissionId: string | null;
@@ -39,11 +41,13 @@ interface Store {
   setActiveChat: (id: string) => void;
   markSeen: (marks: Record<string, number>) => void;
   setSpaceTheme: (id: string) => void;
+  setAccent: (id: string) => void;
 }
 
 const CHAT_KEY = 'sc-chat';
 const SEEN_KEY = 'sc-seen';
 const SPACE_KEY = 'sc-space';
+const ACCENT_KEY = 'sc-accent';
 const load = <T,>(k: string, d: T): T => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } };
 const keep = (k: string, v: unknown) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* özel pencere */ } };
 
@@ -112,6 +116,7 @@ export const useStore = create<Store>((set, get) => ({
   activeChatId: load<string | null>(CHAT_KEY, null),
   seen: load<Record<string, number>>(SEEN_KEY, {}),
   spaceTheme: load<string>(SPACE_KEY, 'nebula'),
+  accent: load<string>(ACCENT_KEY, 'green'),
   view: VIEWS.includes(location.hash.slice(1) as View) ? (location.hash.slice(1) as View) : 'base',
   selectedAgentId: null,
   selectedMissionId: null,
@@ -130,6 +135,7 @@ export const useStore = create<Store>((set, get) => ({
   openModal: (modal) => set({ modal }),
   setActiveChat: (id) => { keep(CHAT_KEY, id); set({ activeChatId: id }); },
   setSpaceTheme: (id) => { keep(SPACE_KEY, id); set({ spaceTheme: id }); },
+  setAccent: (id) => { keep(ACCENT_KEY, id); set({ accent: id }); },
   markSeen: (marks) => {
     const seen = { ...get().seen, ...marks };
     keep(SEEN_KEY, seen);

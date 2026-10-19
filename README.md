@@ -23,6 +23,7 @@ Her şey kendi bilgisayarında çalışır, telefondan da yönetebilirsin.
 - **İstediğin yapay zekâ.** Claude (abonelik ya da API anahtarı), OpenAI, Google Gemini, OpenRouter, Ollama ile tamamen yerel ya da OpenAI uyumlu herhangi bir servis.
 - **Oyun gibi arayüz.** Piksel sanat uzay istasyonu: her ekip temalı bir odada, her ajan rolüne göre giyinmiş bir karakter. Gezinmek ve yakınlaşmak serbest. Odaları ikize bağlayan kablolarda fosforlu akış görürsün: yeşil şerit ikizden odaya giden emirler, kırmızı şerit odadan dönen raporlar. Ekip çalışırken akış hızlanır, duraklatılınca söner.
 - **Arka plan temaları.** Mor nebula, derin okyanus, kızıl bulutsu, zümrüt aurora, altın güneş, pembe galaksi ve sessiz boşluk. Ayarlar'dan seçilir, her cihaz kendi seçimini hatırlar.
+- **Vurgu rengi.** Radyoaktif yeşil, plazma mavisi, kobalt, mor enerji, neon pembe, kızıl çekirdek, turuncu alev ya da altın. Düğmeler, sekmeler, seçimler ve ikizin nükleer reaktöründeki ışıklar seçtiğin renge bürünür.
 - **Telefondan kontrol.** QR kodu okut, ana ekrana ekle; aynı Wi-Fi'da ya da Tailscale ile her yerden.
 - **Sesli konuşma, fotoğraf ve dosya.** Mikrofonla konuş, fotoğraf gönder, bilgisayarındaki klasörleri ajanlara (salt okunur ya da yazılabilir) aç.
 - **Uçan pencere.** İkizinle her zaman üstte duran küçük bir pencerede konuş (Chrome).

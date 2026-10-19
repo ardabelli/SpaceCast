@@ -14,14 +14,15 @@ Her şey kendi bilgisayarında çalışır, telefondan da yönetebilirsin.
 
 ## Özellikler
 
-- **Dijital ikiz.** Adını sen koyarsın. Sohbet eder, işi anlar, doğru ekiplere görev açar ve bitince rapor verir.
+- **Dijital ikiz.** Adını ve görünüşünü sen seçersin: gündelik kadın ve erkek, bilim insanı, hacker, pilot, elf, büyücü, vampir, korsan, android, uzaylı, uzay kedisi ve daha fazlası (16 piksel karakter). Sohbet eder, işi anlar, doğru ekiplere görev açar ve bitince rapor verir.
 - **Sekmeli sohbetler.** İkizinle aynı anda birden fazla konuşma açabilirsin; her görevin raporu ve onay soruları, görevin başladığı sohbete düşer.
 - **Düşünme seviyesi.** Her ajan için *Önerilen / Düşük / Orta / Yüksek*. Önerilen seviye ajanın rolüne göre seçilir: sohbet ve planlama düşük, araştırma, yazı ve kod orta.
 - **Ajan ekipleri.** Hazır üç ekiple gelir (Uygulama Atölyesi, Ticaret Masası, Araştırma & İçerik); istediğin kadar ekip ve ajan ekleyebilirsin. Liderler işi ekibine aşamalar halinde böler, ekip aynı çalışma klasöründe birlikte çalışır.
 - **Gerçek iş.** Ajanlar web'de araştırır, dosya okur ve yazar, kod geliştirir. Çıktılar `data/workspaces` altındaki görev klasörlerinde durur.
 - **Onay kuyruğu.** Para harcamak, yayına almak, mesaj göndermek gibi geri alınamaz işler ajanlar tarafından yalnızca önerilir; sen onaylamadan yapılmaz.
 - **İstediğin yapay zekâ.** Claude (abonelik ya da API anahtarı), OpenAI, Google Gemini, OpenRouter, Ollama ile tamamen yerel ya da OpenAI uyumlu herhangi bir servis.
-- **Oyun gibi arayüz.** Piksel sanat uzay istasyonu: her ekip temalı bir odada, her ajan rolüne göre giyinmiş bir karakter. Gezinmek ve yakınlaşmak serbest.
+- **Oyun gibi arayüz.** Piksel sanat uzay istasyonu: her ekip temalı bir odada, her ajan rolüne göre giyinmiş bir karakter. Gezinmek ve yakınlaşmak serbest. Odaları ikize bağlayan kablolarda fosforlu akış görürsün: yeşil şerit ikizden odaya giden emirler, kırmızı şerit odadan dönen raporlar. Ekip çalışırken akış hızlanır, duraklatılınca söner.
+- **Arka plan temaları.** Mor nebula, derin okyanus, kızıl bulutsu, zümrüt aurora, altın güneş, pembe galaksi ve sessiz boşluk. Ayarlar'dan seçilir, her cihaz kendi seçimini hatırlar.
 - **Telefondan kontrol.** QR kodu okut, ana ekrana ekle; aynı Wi-Fi'da ya da Tailscale ile her yerden.
 - **Sesli konuşma, fotoğraf ve dosya.** Mikrofonla konuş, fotoğraf gönder, bilgisayarındaki klasörleri ajanlara (salt okunur ya da yazılabilir) aç.
 - **Uçan pencere.** İkizinle her zaman üstte duran küçük bir pencerede konuş (Chrome).

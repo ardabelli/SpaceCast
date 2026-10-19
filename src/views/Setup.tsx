@@ -7,6 +7,7 @@ import { Icon } from '../icons.tsx';
 import { api, setKey, showToast, useStore } from '../store.ts';
 import { Modal } from '../ui.tsx';
 import { AvatarPicker } from './AvatarPicker.tsx';
+import { SpacePicker } from './SpacePicker.tsx';
 
 interface SetupStatus {
   settings: PublicSettings;
@@ -432,6 +433,10 @@ export function SettingsModal() {
       <section className="col" style={{ gap: 10 }}>
         <h3 className="sec-h">İkizin karakteri <small className="dim">· seçince hemen değişir</small></h3>
         <AvatarPicker />
+      </section>
+      <section className="col" style={{ gap: 10 }}>
+        <h3 className="sec-h">Arka plan <small className="dim">· bu cihazda, seçince hemen değişir</small></h3>
+        <SpacePicker />
       </section>
       <section className="col" style={{ gap: 10 }}>
         <h3 className="sec-h">Yapay zekâ sağlayıcısı</h3>

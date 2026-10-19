@@ -25,6 +25,8 @@ interface Store {
   activeChatId: string | null;
   /** Sohbetlerin bu cihazda en son görüldüğü an (okunmamış işareti için) */
   seen: Record<string, number>;
+  /** Arka plan uzay teması (bu cihazda) */
+  spaceTheme: string;
   view: View;
   selectedAgentId: string | null;
   selectedMissionId: string | null;
@@ -36,10 +38,12 @@ interface Store {
   openModal: (m: Store['modal']) => void;
   setActiveChat: (id: string) => void;
   markSeen: (marks: Record<string, number>) => void;
+  setSpaceTheme: (id: string) => void;
 }
 
 const CHAT_KEY = 'sc-chat';
 const SEEN_KEY = 'sc-seen';
+const SPACE_KEY = 'sc-space';
 const load = <T,>(k: string, d: T): T => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } };
 const keep = (k: string, v: unknown) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* özel pencere */ } };
 
@@ -107,6 +111,7 @@ export const useStore = create<Store>((set, get) => ({
   toast: null,
   activeChatId: load<string | null>(CHAT_KEY, null),
   seen: load<Record<string, number>>(SEEN_KEY, {}),
+  spaceTheme: load<string>(SPACE_KEY, 'nebula'),
   view: VIEWS.includes(location.hash.slice(1) as View) ? (location.hash.slice(1) as View) : 'base',
   selectedAgentId: null,
   selectedMissionId: null,
@@ -124,6 +129,7 @@ export const useStore = create<Store>((set, get) => ({
   selectMission: (id) => set({ selectedMissionId: id }),
   openModal: (modal) => set({ modal }),
   setActiveChat: (id) => { keep(CHAT_KEY, id); set({ activeChatId: id }); },
+  setSpaceTheme: (id) => { keep(SPACE_KEY, id); set({ spaceTheme: id }); },
   markSeen: (marks) => {
     const seen = { ...get().seen, ...marks };
     keep(SEEN_KEY, seen);

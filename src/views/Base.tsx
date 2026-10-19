@@ -217,12 +217,17 @@ export function Base() {
               const r = L.rooms[i];
               const c = center(r);
               const d = narrow ? `M${coreC.x} ${L.core.y + L.core.h} V${r.y}` : `M${coreC.x} ${coreC.y} H${c.x} V${c.y}`;
-              const { busy } = teamState(s, t);
+              const { busy, paused } = teamState(s, t);
+              const mode = paused ? 'paused' : busy ? 'hot' : 'idle';
+              // İki şerit: yeşil = ikizden odaya giden emirler, kırmızı = odadan ikize dönen raporlar
               return (
                 <g key={t.id}>
                   <path d={d} className="pipe-outer" />
                   <path d={d} className="pipe-inner" />
-                  <path d={d} className={`pipe-flow ${busy ? 'hot' : 'idle'}`} style={{ stroke: busy ? t.color : undefined }} />
+                  <path d={d} className="pipe-cable" transform="translate(-5 -5)" />
+                  <path d={d} className="pipe-cable" transform="translate(5 5)" />
+                  <path d={d} className={`pipe-lane out ${mode}`} transform="translate(-5 -5)" />
+                  <path d={d} className={`pipe-lane in ${mode}`} transform="translate(5 5)" />
                 </g>
               );
             })}
